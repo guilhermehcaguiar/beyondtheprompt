@@ -12,12 +12,12 @@ export const institution = {
   name: 'Uninassau',
   adviser: 'David Wilber',
   members: [
-    'Gabriel Fernando',
-    'Guilherm Aguiar',
     'Arthur Niceas',
-    'Lucas Cardoso',
     'Felipe Paskevicius',
+    'Gabriel Fernando',
+    'Guilherme Aguiar',
     'Lucas Barreto',
+    'Lucas Cardoso',
   ],
   credits: 'Conteúdo, design e desenvolvimento pela equipe do projeto de extensão.',
 };

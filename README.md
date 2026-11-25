@@ -59,9 +59,9 @@ Ao alterar um arquivo de conteúdo, preserve os identificadores de seções que 
 
 **Integrantes**
 
-- Gabriel Fernando
-- Guilherm Aguiar
 - Arthur Niceas
-- Lucas Cardoso
 - Felipe Paskevicius
+- Gabriel Fernando
+- Guilherme Aguiar
 - Lucas Barreto
+- Lucas Cardoso
