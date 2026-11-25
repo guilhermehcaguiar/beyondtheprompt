@@ -1242,3 +1242,57 @@ dialog[open]::backdrop {
     opacity: 0;
   }
 }
+
+.workshop-instructions {
+  list-style: decimal;
+  margin: 0 0 1rem;
+  padding-left: 1.5rem;
+}
+.workshop-instructions li + li {
+  margin-top: 0.45rem;
+}
+.workshop-feedback summary {
+  width: fit-content;
+  min-height: 44px;
+  align-content: center;
+  color: var(--accent-text);
+  cursor: pointer;
+  font-weight: 650;
+}
+.workshop-feedback[open] p:first-of-type {
+  margin-top: 0.4rem;
+}
+.quiz-setup-fields {
+  display: grid;
+  gap: 0.15rem 0.85rem;
+}
+.lab-index {
+  scroll-margin-block-start: 0.8rem;
+}
+.lab-challenge {
+  margin-block: 0.95rem;
+}
+.lab-step-nav {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem 1rem;
+  margin-block: 1.25rem 2.7rem;
+}
+.lab-step-nav .button {
+  text-align: left;
+}
+@media (min-width: 44rem) {
+  .quiz-setup-fields {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (max-width: 35.99rem) {
+  .lab-index {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .lab-step-nav .button {
+    width: 100%;
+  }
+}

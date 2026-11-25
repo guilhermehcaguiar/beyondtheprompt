@@ -4,6 +4,7 @@ import {
   BookOpen,
   BrainCircuit,
   ChevronRight,
+  Clock,
   FlaskConical,
   ShieldCheck,
   Terminal,
@@ -12,7 +13,6 @@ import {
 import { HeroDiagram } from '@/components/hero-diagram';
 import { TrailProgress } from '@/components/personal';
 import { lessons, site } from '@/content/site';
-import { experiments } from '@/content/lab';
 import { tokenize } from '@/lib/lab';
 import './home.css';
 
@@ -40,9 +40,10 @@ export default function Home() {
                 Explorar o laboratório
               </Link>
             </div>
-            <p className="hero-facts">
-              {lessons.length} módulos <span aria-hidden="true">·</span> {experiments.length} experiências
-            </p>
+            <Link href="/oficina/" className="text-link hero-workshop" prefetch={false}>
+              <Clock size={17} aria-hidden="true" />
+              Fazer a oficina de 15 minutos
+            </Link>
           </div>
           <HeroDiagram />
         </div>

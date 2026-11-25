@@ -10,7 +10,13 @@ import {
   evaluateNetwork,
   tokenize,
 } from '../src/lib/lab.ts';
-import { shuffled } from '../src/lib/quiz.ts';
+import {
+  createQuizSession,
+  defaultQuizSettings,
+  quizRound,
+  readQuizSession,
+  shuffled,
+} from '../src/lib/quiz.ts';
 import { includesQuery } from '../src/lib/search.ts';
 
 test('tokenização didática trata pontuação, acentos e entradas vazias', () => {
@@ -86,4 +92,61 @@ test('glossário contém termos distintos e aponta para lições válidas', () =
   assert.ok(glossary.length >= 35);
   assert.equal(new Set(glossary.map((t) => t.id)).size, glossary.length);
   assert.ok(glossary.every((term) => lessons.some((lesson) => lesson.slug === term.lesson)));
+});
+
+test('quiz oferece rodadas de cinco, dez ou todas as questões e respeita os filtros', () => {
+  for (const [length, expected] of [
+    ['5', 5],
+    ['10', 10],
+    ['all', questions.length],
+  ] as const) {
+    const session = createQuizSession({ ...defaultQuizSettings, length });
+    assert.equal(session?.round.length, expected);
+    assert.equal(new Set(session?.round.map(({ id }) => id)).size, expected);
+  }
+  const settings = {
+    ...defaultQuizSettings,
+    category: 'fundamentos',
+    difficulty: 'Introdutório',
+    length: '10',
+  } as const;
+  const session = createQuizSession(settings);
+  assert.ok(session);
+  const round = quizRound(session.round);
+  assert.equal(
+    round.length,
+    questions.filter(
+      (question) => question.category === settings.category && question.difficulty === settings.difficulty,
+    ).length,
+  );
+  assert.ok(
+    round.every(
+      (question) => question.category === settings.category && question.difficulty === settings.difficulty,
+    ),
+  );
+});
+
+test('a rodada salva preserva perguntas, alternativas, respostas e a questão atual', () => {
+  const started = createQuizSession(defaultQuizSettings, () => 0);
+  assert.ok(started);
+  const progress = { ...started, position: 1, answers: [1], selected: 0 };
+  const restored = readQuizSession(JSON.stringify(progress));
+  assert.deepEqual(restored, progress);
+  assert.deepEqual(quizRound(restored?.round ?? []), quizRound(progress.round));
+  assert.deepEqual(readQuizSession(JSON.stringify({ ...progress, answers: [1, 0] }))?.answers, [1, 0]);
+});
+
+test('uma sessão inválida não impede iniciar uma nova rodada', () => {
+  const session = createQuizSession(defaultQuizSettings);
+  assert.ok(session);
+  for (const invalid of [
+    '{',
+    JSON.stringify({ ...session, version: 0 }),
+    JSON.stringify({ ...session, position: 2 }),
+    JSON.stringify({ ...session, answers: [99], selected: 99 }),
+    JSON.stringify({ ...session, round: [{ ...session.round[0], options: [0, 0, 1] }] }),
+    JSON.stringify({ ...session, round: [{ ...session.round[0], id: 'questao-removida' }] }),
+  ]) {
+    assert.equal(readQuizSession(invalid), null);
+  }
 });

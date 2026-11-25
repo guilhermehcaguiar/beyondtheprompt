@@ -3,36 +3,49 @@ export const experiments = [
     id: 'tokenizacao',
     title: 'Simulador de tokenização',
     description: 'Observe como o mesmo texto pode ser dividido em unidades menores.',
+    challenge:
+      'Digite “Inteligência artificial!” e depois apague o ponto de exclamação. Compare as unidades coloridas e os totais.',
   },
   {
     id: 'previsao',
     title: 'Previsão do próximo token',
     description: 'Altere a temperatura e veja como o contexto muda as opções de continuação.',
+    challenge:
+      'Compare as chances do primeiro token a 0,5 e 1,5. Em seguida, escolha duas continuações diferentes e compare as opções que aparecem.',
   },
   {
     id: 'construtor',
     title: 'Construtor de prompts',
     description: 'Transforme uma ideia em uma instrução estruturada.',
+    challenge: 'Carregue “Revisar funções”, mude uma restrição e localize a alteração no prompt gerado.',
   },
   {
     id: 'comparador',
     title: 'Comparador de prompts',
     description: 'Compare respostas simuladas para instruções sobre a mesma tarefa.',
+    challenge:
+      'Selecione “Revisar um conteúdo”. Identifique qual instrução preserva a tentativa do estudante e a frase do prompt que produz esse efeito.',
   },
   {
     id: 'rede-neural',
     title: 'Rede neural interativa',
     description: 'Manipule entradas e pesos, e acompanhe o cálculo até a saída.',
+    challenge:
+      'Deixe as duas entradas positivas e reduza um dos pesos. Observe quando a saída do neurônio oculto chega a zero.',
   },
   {
     id: 'critico',
     title: 'Desafio de pensamento crítico',
     description: 'Identifique o problema principal em cada resposta fictícia.',
+    challenge:
+      'Leia dois casos e classifique o problema principal. Compare sua resposta com o feedback e diga qual verificação faria primeiro.',
   },
   {
     id: 'vies',
     title: 'Demonstração de viés',
     description: 'Altere a proporção de exemplos de treino e compare os erros em um teste equilibrado.',
+    challenge:
+      'Compare 50 e 90 exemplos da classe A. Observe o que acontece com os acertos na classe B quando ela fica sub-representada no treino.',
   },
 ] as const;
 

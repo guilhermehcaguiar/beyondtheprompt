@@ -46,11 +46,13 @@
 .hero-copy .button {
   min-height: 48px;
 }
-.hero-facts {
-  display: flex;
-  gap: 0.55rem;
-  margin-top: 1.15rem;
-  font-size: 0.85rem;
+.hero-workshop {
+  gap: 0.45rem;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+}
+.hero-workshop svg {
+  flex: none;
 }
 
 .hero-diagram {
@@ -474,9 +476,6 @@
     margin-top: 1.15rem;
     display: grid;
     max-width: 26rem;
-  }
-  .hero-facts {
-    margin-top: 0.75rem;
   }
   .prediction-head {
     padding-block: 0.5rem;

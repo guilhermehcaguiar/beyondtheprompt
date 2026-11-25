@@ -61,9 +61,9 @@ export default function AboutPage() {
         <section id="privacidade">
           <h2>Privacidade</h2>
           <p>
-            As preferências de tema e o progresso da trilha ficam armazenados apenas neste navegador. Você pode
-            redefinir o progresso na página inicial. As respostas do quiz e os textos digitados no laboratório
-            são usados durante a interação e ficam na memória da página.
+            As preferências de tema, o progresso da trilha e a rodada em andamento do quiz ficam neste
+            navegador. Você pode redefinir o progresso na página inicial ou substituir a rodada do quiz. Os
+            textos da oficina e do laboratório ficam na memória da página durante a interação.
           </p>
           <p>
             O acesso dispensa identificação. Ao abrir um link externo, consulte as condições de privacidade
