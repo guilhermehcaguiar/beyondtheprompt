@@ -11,7 +11,7 @@ export default function QuizPage() {
     <>
       <PageIntro
         title="Quiz de inteligência artificial"
-        description="Resolva situações práticas e veja por que cada alternativa funciona ou falha."
+        description="Escolha uma rodada curta ou completa, veja a explicação das respostas e continue depois no mesmo navegador."
         label="Avaliação"
       />
       <div className="wrap page-body">

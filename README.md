@@ -13,7 +13,7 @@ npm ci
 npm run dev
 ```
 
-Acesse `http://localhost:3000`. A instalação inicial precisa baixar as dependências. Fontes, dados do quiz, referências, diagramas e textos ficam no projeto. O site publicado funciona com arquivos estáticos. Interações e busca rodam no navegador. Tema e progresso ficam em `localStorage`, e o quiz e o laboratório usam memória da página.
+Acesse `http://localhost:3000`. A instalação inicial precisa baixar as dependências. Fontes, dados do quiz, referências, diagramas e textos ficam no projeto. O site publicado funciona com arquivos estáticos. Interações e busca rodam no navegador. Tema, progresso da trilha e uma rodada em andamento do quiz ficam em `localStorage`. Os textos da oficina e do laboratório ficam na memória da página.
 
 ## Build e verificações
 
@@ -25,6 +25,8 @@ npm run build
 npm run test:export
 python3 -m http.server 4173 --directory out
 ```
+
+Os pull requests para `main` executam lint, tipos, testes e build no GitHub Actions. Use o preview da Vercel para conferir a interface antes de mesclar.
 
 Abra `http://localhost:4173` para conferir a exportação. O teste de exportação verifica o HTML, os metadados, os arquivos publicados, as rotas e as âncoras. Para reproduzir a verificação visual, navegue pela página inicial, por uma lição, pelo laboratório e pelo quiz em larguras de 360, 768 e 1440 px. Confira foco, menu, busca, temas, cópia e progresso pelo teclado. Rode o Lighthouse na exportação servida por HTTP para medir desempenho, acessibilidade, boas práticas e SEO.
 

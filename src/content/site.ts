@@ -64,6 +64,11 @@ export const lessons = [
 export type LessonSlug = (typeof lessons)[number]['slug'];
 
 export const resources = {
+  oficina: {
+    slug: 'oficina',
+    title: 'Oficina de 15 minutos',
+    description: 'Conheça os tokens, compare previsões em uma simulação e pratique a verificação de respostas.',
+  },
   laboratorio: {
     slug: 'laboratorio',
     title: 'Laboratório',

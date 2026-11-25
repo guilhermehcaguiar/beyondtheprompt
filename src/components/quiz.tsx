@@ -1,25 +1,54 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useRef, useState } from 'react';
-import { categories, questions, type Category, type Difficulty, type Question } from '@/content/questions';
-import { shuffled } from '@/lib/quiz';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { categories } from '@/content/questions';
+import { readLocal, writeLocal } from '@/lib/local';
+import {
+  createQuizSession,
+  defaultQuizSettings,
+  matchQuizQuestions,
+  quizLength,
+  quizRound,
+  readQuizSession,
+  type QuizSession,
+  type QuizSettings,
+} from '@/lib/quiz';
 import { Select } from './select';
 
+const sessionKey = 'btp:quiz-session';
+const sessionChange = 'btp-quiz-session-change';
+
+function subscribeSession(callback: () => void) {
+  window.addEventListener('storage', callback);
+  window.addEventListener(sessionChange, callback);
+  return () => {
+    window.removeEventListener('storage', callback);
+    window.removeEventListener(sessionChange, callback);
+  };
+}
+
+function storeSession(session: QuizSession | null) {
+  writeLocal(sessionKey, session ? JSON.stringify(session) : null);
+  window.dispatchEvent(new Event(sessionChange));
+}
+
 export function Quiz() {
-  const [category, setCategory] = useState<Category | ''>('');
-  const [difficulty, setDifficulty] = useState<Difficulty | ''>('');
-  const [round, setRound] = useState<Question[]>([]);
-  const [position, setPosition] = useState(0);
-  const [answers, setAnswers] = useState<number[]>([]);
-  const [selected, setSelected] = useState<number>();
+  const [settings, setSettings] = useState(defaultQuizSettings);
+  const [session, setSession] = useState<QuizSession | null>(null);
   const [finished, setFinished] = useState(false);
+  const rawSession = useSyncExternalStore(
+    subscribeSession,
+    () => readLocal(sessionKey),
+    () => null,
+  );
+  const saved = session ? null : readQuizSession(rawSession);
   const focus = useRef<HTMLHeadingElement>(null);
   const feedback = useRef<HTMLDivElement>(null);
-  const playing = round.length > 0;
-  const available = questions.filter(
-    (q) => (!category || q.category === category) && (!difficulty || q.difficulty === difficulty),
-  );
+  const playing = session !== null;
+  const count = quizLength(matchQuizQuestions(settings).length, settings.length);
+  const round = session ? quizRound(session.round) : [];
+  const { position, answers, selected } = session ?? { position: 0, answers: [], selected: null };
   const current = round[position];
   const answer = answers[position];
   const reviewed = answer !== undefined;
@@ -31,23 +60,29 @@ export function Quiz() {
     if (reviewed && !finished) feedback.current?.focus();
   }, [reviewed, finished]);
 
+  function updateSession(next: QuizSession) {
+    setSession(next);
+    storeSession(next);
+  }
+
   function start() {
-    setRound(shuffled(available).map((question) => ({ ...question, options: shuffled(question.options) })));
-    setPosition(0);
-    setAnswers([]);
-    setSelected(undefined);
+    const next = createQuizSession(settings);
+    if (!next) return;
+    updateSession(next);
     setFinished(false);
   }
 
   function next() {
-    if (position + 1 === round.length) setFinished(true);
-    else {
-      setPosition(position + 1);
-      setSelected(undefined);
+    if (!session || !reviewed) return;
+    if (position + 1 < round.length) {
+      updateSession({ ...session, position: position + 1, selected: null });
+      return;
     }
+    if (readLocal(sessionKey) === JSON.stringify(session)) storeSession(null);
+    setFinished(true);
   }
 
-  if (!playing)
+  if (!session)
     return (
       <form
         className="panel quiz-shell"
@@ -60,13 +95,34 @@ export function Quiz() {
           Monte sua rodada
         </h2>
         <p>Escolha um assunto ou misture todas as categorias no modo geral.</p>
-        <div className="filters mt-4">
+        {saved && (
+          <div className="callout">
+            <p>
+              <strong>Rodada salva</strong> · {saved.answers.length} de {saved.round.length} questões
+              respondidas.
+            </p>
+            <button
+              type="button"
+              className="button secondary mt-3"
+              onClick={() => {
+                setSettings(saved.settings);
+                setSession(saved);
+                setFinished(false);
+              }}
+            >
+              Continuar rodada
+            </button>
+          </div>
+        )}
+        <div className="quiz-setup-fields mt-4">
           <div className="field">
             <label htmlFor="quiz-category">Categoria</label>
             <Select
               id="quiz-category"
-              value={category}
-              onChange={(event) => setCategory(event.target.value as Category | '')}
+              value={settings.category}
+              onChange={(event) =>
+                setSettings({ ...settings, category: event.target.value as QuizSettings['category'] })
+              }
             >
               <option value="">Modo geral</option>
               {Object.entries(categories).map(([value, item]) => (
@@ -80,20 +136,37 @@ export function Quiz() {
             <label htmlFor="quiz-level">Dificuldade</label>
             <Select
               id="quiz-level"
-              value={difficulty}
-              onChange={(event) => setDifficulty(event.target.value as Difficulty | '')}
+              value={settings.difficulty}
+              onChange={(event) =>
+                setSettings({ ...settings, difficulty: event.target.value as QuizSettings['difficulty'] })
+              }
             >
               <option value="">Todos os níveis</option>
               <option>Introdutório</option>
               <option>Intermediário</option>
             </Select>
           </div>
+          <div className="field">
+            <label htmlFor="quiz-length">Tamanho da rodada</label>
+            <Select
+              id="quiz-length"
+              value={settings.length}
+              onChange={(event) =>
+                setSettings({ ...settings, length: event.target.value as QuizSettings['length'] })
+              }
+            >
+              <option value="5">Até 5 questões</option>
+              <option value="10">Até 10 questões</option>
+              <option value="all">Rodada completa</option>
+            </Select>
+          </div>
         </div>
         <p className="results-count" role="status">
-          {available.length} {available.length === 1 ? 'questão' : 'questões'} na rodada.
+          {count} {count === 1 ? 'questão' : 'questões'} na rodada.
         </p>
-        <button className="button primary" type="submit" disabled={!available.length}>
-          Iniciar quiz
+        {saved && <p className="mb-3">Uma nova rodada substitui o andamento salvo.</p>}
+        <button className="button primary" type="submit" disabled={!count}>
+          {saved ? 'Iniciar nova rodada' : 'Iniciar quiz'}
         </button>
       </form>
     );
@@ -153,7 +226,8 @@ export function Quiz() {
             type="button"
             className="button secondary"
             onClick={() => {
-              setRound([]);
+              setSession(null);
+              setFinished(false);
               requestAnimationFrame(() => focus.current?.focus());
             }}
           >
@@ -184,7 +258,7 @@ export function Quiz() {
       <form
         onSubmit={(event) => {
           event.preventDefault();
-          if (!reviewed && selected !== undefined) setAnswers([...answers, selected]);
+          if (!reviewed && selected !== null) updateSession({ ...session, answers: [...answers, selected] });
         }}
       >
         <fieldset disabled={reviewed}>
@@ -200,7 +274,7 @@ export function Quiz() {
                   name="quiz-answer"
                   value={index}
                   checked={selected === index}
-                  onChange={() => setSelected(index)}
+                  onChange={() => updateSession({ ...session, selected: index })}
                 />
                 <span>
                   {option.text}
@@ -211,7 +285,7 @@ export function Quiz() {
           </div>
         </fieldset>
         {!reviewed && (
-          <button type="submit" className="button primary" disabled={selected === undefined}>
+          <button type="submit" className="button primary" disabled={selected === null}>
             Confirmar resposta
           </button>
         )}
